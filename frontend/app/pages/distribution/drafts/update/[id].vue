@@ -2,8 +2,8 @@
 import ProfileLayout from "@/layouts/profile.vue";
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import type {DraftRecord, UsersRecord} from "~/lib/pocketbase-types";
-import {usePocketBase} from "~/lib/usePocketbase";
+import type { DraftRecord, UsersRecord } from "~/lib/pocketbase-types";
+import { usePocketBase } from "~/lib/usePocketbase";
 import { ca } from "zod/v4/locales";
 
 const route = useRoute()
@@ -18,6 +18,8 @@ const toast = useToast()
 
 const draftID = ref<string>(route.params.id as string)
 const draft = ref<DraftRecord | null>(null)
+
+const isOpenModalLogo = ref<boolean>(false)
 
 onMounted(async () => {
   try {
@@ -126,56 +128,66 @@ async function uploadAvatarToServer(file: File) {
     draft.value = await pb.collection('draft').getOne(draftID.value)
   } catch (error: any) {
     console.error('❌ Ошибка загрузки:', error);
-    const toast = useToast();
-    toast.add({
-      title: 'Ошибка',
-      description: error.message || 'Не удалось загрузить обложку',
-      icon: 'i-heroicons-exclamation-circle',
-    });
   }
-  }
+}
 
 const data = reactive({
-    urlLogo: undefined as File | undefined,
+  urlLogo: undefined as File | undefined,
 })
 
 watch(() => state.avatar, () => {
-    console.log(state.avatar)
-    uploadAvatarToServer(state.avatar!)
+  console.log(state.avatar)
+  uploadAvatarToServer(state.avatar!)
 })
 
+const openModalLogo = () => {
+  isOpenModalLogo.value = !isOpenModalLogo.value
+}
+
 const handleCreateDraft = async (data: {
-    urlLogo: File,
+  urlLogo: File,
 }) => {
-    const formData = new FormData()
+  const formData = new FormData()
 
 }
 
 </script>
 
 <template>
-    <ProfileLayout>
-        <div class="pl-5">
-            <div class="flex w-[600px] lg:w-[1020px] justify-center">
-                <div class="flex flex-col items-center gap-5">
-                    <p class="flex text-4xl">Загрузить релиз</p>
-                      <div v-if="!draft?.logo" class="">
-                        <UFileUpload
-                        v-slot="{ open, removeFile }" v-model="state.avatar" accept="image/*"
-                        size="xl"
-                        variant="area"
-                        label="Загрузите Обложку"
-                        description="JPG (3000x3000px)"
-                        class="w-[300px] h-[300px]"
-                    />
-                      </div>
-                      <div v-else class="w-[300px] h-[300px]">
-                          <NuxtImg  :src="pb.files.getURL(draft, draft.logo)" />
-                      </div>
+  <ProfileLayout>
+    <div class="pl-5">
+      <div class="flex w-[600px] lg:w-[1020px] justify-center">
+        <div class="flex flex-col items-center gap-5">
+          <p class="flex text-4xl">Загрузить релиз</p>
+          <div class="">
+            <UModal class="w-[340px] h-[400px] flex justify-center cursor-pointer" :open="isOpenModalLogo">
+              <template #content>
+                <div class=" flex flex-col justify-center items-center gap-5">
+                  <UFileUpload v-slot="{ open, removeFile }" v-model="state.avatar" accept="image/*" size="xl"
+                    variant="area" label="Загрузите Обложку" description="JPG (3000x3000px)"
+                    class="w-[250px] h-[250px]" />
+                  <div class="flex w-[250px]">
+                    <UButton @click="openModalLogo" class="w-full justify-center" size="xl" color="neutral" variant="outline">Готово</UButton>
+                  </div>
                 </div>
-            </div>
+              </template>
+            </UModal>
+          </div>
+          <div v-if="draft?.logo" class="w-[300px] h-[300px]">
+            <NuxtImg class=" rounded-2xl" :src="pb.files.getURL(draft, draft.logo!)" />
+          </div>
+          <div v-else class="w-[300px] h-[300px] flex items-center justify-center 
+                    rounded-xl bg-white/20">
+            <Icon class=" opacity-70" size="128" name="solar:box-broken" />
+          </div>
+          <div class="w-[300px]">
+            <UButton class="flex w-full justify-center items-center text-md" @click="openModalLogo" 
+              label="Загрузить обложку" icon="solar:gallery-download-bold" size="xl" color="neutral" variant="outline" />
+          </div>
         </div>
-    </ProfileLayout>
+      </div>
+    </div>
+  </ProfileLayout>
 </template>
 
 
