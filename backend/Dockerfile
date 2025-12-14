@@ -3,9 +3,6 @@ FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-# Install git for go modules
-RUN apk add --no-cache git
-
 # Copy go mod files
 COPY go.mod go.sum ./
 
@@ -15,24 +12,26 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main .
+# Build with CGO disabled (для Alpine)
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Final stage
+# Production stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates sqlite
+WORKDIR /app
 
-WORKDIR /root/
+# Install CA certificates for HTTPS (если нужно)
+RUN apk --no-cache add ca-certificates
 
-# Copy the binary from builder stage
+# Copy binary
 COPY --from=builder /app/main .
 
-# Copy PocketBase data directory if it exists
-COPY --from=builder /app/pb_data ./pb_data
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
 
-# Expose port
-EXPOSE 8090
+USER appuser
 
-# Run the binary
+EXPOSE 8080
+
 CMD ["./main"]
