@@ -34,4 +34,4 @@ USER appuser
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["./main", "serve", "--http=0.0.0.0:8090"]

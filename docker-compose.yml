@@ -1,26 +1,22 @@
+version: '3.8'
+
 services:
   backend:
     build:
-      context: .
-      target: backend-runner
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8090:8090"
     volumes:
-      - ./backend/pb_data:/app/pb_data
+      - ./backend/pb_data:/root/pb_data
     environment:
       - GO_ENV=production
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     restart: unless-stopped
 
   frontend:
     build:
-      context: .
-      target: frontend-runner
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -29,8 +25,7 @@ services:
       - PORT=3000
       - POCKETBASE_URL=http://backend:8090
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     restart: unless-stopped
 
   nginx:
