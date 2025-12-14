@@ -13,7 +13,7 @@ RUN bun install --frozen-lockfile
 COPY . .
 
 # Generate types and build
-RUN bun typegen && bun run build
+RUN bun run build
 
 # Production stage
 FROM oven/bun:1-alpine AS runner
