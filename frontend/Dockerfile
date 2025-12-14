@@ -1,22 +1,22 @@
 # Frontend Dockerfile
-FROM oven/bun:1-alpine AS builder
+FROM node:18-alpine AS builder  # ИСПОЛЬЗУЙТЕ NODE вместо Bun
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json package-lock.json ./
 
-# Install ALL dependencies
-RUN bun install
+# Install dependencies
+RUN npm ci
 
 # Copy source code
 COPY . .
 
 # Build
-RUN bun run build
+RUN npm run build
 
 # Production stage
-FROM oven/bun:1-alpine AS runner
+FROM node:18-alpine AS runner
 
 WORKDIR /app
 
@@ -25,10 +25,10 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json package-lock.json ./
 
 # Install production dependencies
-RUN bun install --production
+RUN npm ci --only=production
 
 # Copy built application
 COPY --from=builder --chown=nextjs:nodejs /app/.output ./.output
@@ -44,4 +44,4 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV NODE_ENV=production
 
-CMD ["bun", ".output/server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
