@@ -1,0 +1,82 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ test-realese ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub (optional)
+      if: ${{ secrets.DOCKER_USERNAME }}
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Build and push backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: ${{ secrets.DOCKER_USERNAME != '' }}
+        tags: |
+          ${{ secrets.DOCKER_USERNAME || 'local' }}/vlt-music-backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: ${{ secrets.DOCKER_USERNAME != '' }}
+        tags: |
+          ${{ secrets.DOCKER_USERNAME || 'local' }}/vlt-music-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_PORT || 22 }}
+        script: |
+          cd /opt/vlt-music
+          
+          # Pull latest changes
+          git pull origin test-realese
+          
+          # Stop existing containers
+          docker-compose down
+          
+          # Pull new images (if using registry)
+          if [ "${{ secrets.DOCKER_USERNAME }}" != "" ]; then
+            docker-compose pull
+          else
+            # Build images on server
+            docker-compose build --no-cache
+          fi
+          
+          # Start services
+          docker-compose up -d
+          
+          # Wait for services to be healthy
+          sleep 30
+          
+          # Check if services are running
+          docker-compose ps
+          
+          # Show logs for debugging
+          docker-compose logs --tail=50
+          
+          # Clean up old images
+          docker image prune -f
