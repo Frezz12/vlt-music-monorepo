@@ -14,7 +14,10 @@ FROM oven/bun:1.3 AS runner
 
 WORKDIR /app
 
+# ❗ Копируем И .output, И node_modules
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
