@@ -15,6 +15,13 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  nitro: {
+    externals: {
+      traceInclude: ['ofetch', 'ipx', 'destr', 'ufo']
+    },
+    preset: 'bun'
+  },
+
   css: ['~/assets/css/main.css'],
 
   routeRules: {
