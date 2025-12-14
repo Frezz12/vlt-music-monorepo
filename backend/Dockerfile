@@ -1,6 +1,6 @@
 # -------- Builder --------
 # Используем стабильную версию (1.25 еще нет)
-FROM golang:1.23-alpine AS builder
+FROM golang:1.25.5-alpine3.23 AS builder
 
 WORKDIR /app
 
