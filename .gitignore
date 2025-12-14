@@ -13,6 +13,8 @@ dist-ssr
 coverage
 *.local
 
+pb_data
+
 .vscode/*
 !.vscode/extensions.json
 .idea
