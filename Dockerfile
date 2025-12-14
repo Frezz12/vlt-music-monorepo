@@ -96,4 +96,4 @@ EXPOSE 8090
 
 ENV GO_ENV=production
 
-CMD ["./main"]
+CMD ["./main", "serve", "--http=0.0.0.0:8090"]
