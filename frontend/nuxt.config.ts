@@ -16,10 +16,10 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'bun',
     externals: {
-      traceInclude: ['ofetch', 'ipx', 'destr', 'ufo']
-    },
-    preset: 'bun'
+      inline: ['ofetch']
+    }
   },
 
   css: ['~/assets/css/main.css'],
