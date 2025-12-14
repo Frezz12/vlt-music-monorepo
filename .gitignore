@@ -26,13 +26,6 @@ coverage
 
 .eslintcache
 
-/cypress/videos/
-/cypress/screenshots/
-
-__screenshots__/
-
-launcher/build/bin
-
 auto-imports.d.ts
 components.d.ts
 
