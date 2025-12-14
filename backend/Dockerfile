@@ -20,15 +20,15 @@ FROM alpine:latest
 
 WORKDIR /app
 
-# Install CA certificates for HTTPS (если нужно)
-RUN apk --no-cache add ca-certificates
+# # Install CA certificates for HTTPS (если нужно)
+# RUN apk --no-cache add ca-certificates
 
 # Copy binary
 COPY --from=builder /app/main .
 
-# Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+# # Create non-root user
+# RUN addgroup -g 1001 -S appgroup && \
+#     adduser -u 1001 -S appuser -G appgroup
 
 USER appuser
 
