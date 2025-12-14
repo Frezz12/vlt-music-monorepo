@@ -20,13 +20,33 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT || 22 }}
         script: |
+          # Install Docker and Docker Compose if not installed
+          if ! command -v docker &> /dev/null; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sh get-docker.sh
+            systemctl start docker
+            systemctl enable docker
+          fi
+          
+          if ! command -v docker-compose &> /dev/null; then
+            curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+          fi
+          
+          # Create project directory if not exists
+          mkdir -p /opt/vlt-music
           cd /opt/vlt-music
+          
+          # Clone repository if not exists
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/Frezz12/vlt-music-monorepo.git .
+          fi
           
           # Pull latest changes
           git pull origin test-realese
           
           # Stop existing containers
-          docker-compose down
+          docker-compose down || true
           
           # Build images on server
           docker-compose build --no-cache
