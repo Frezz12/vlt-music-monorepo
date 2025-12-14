@@ -1,5 +1,5 @@
 # Frontend Dockerfile для Nuxt 4 с pnpm
-FROM node:18-alpine AS builder
+FROM node:20-slim AS builder
 
 # Установите pnpm
 RUN npm install -g pnpm
