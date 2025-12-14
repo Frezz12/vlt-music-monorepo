@@ -1,8 +1,0 @@
-{
-  "cors": {
-    "allowOrigins": ["http://localhost:3000"],
-    "allowMethods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    "allowHeaders": ["Content-Type", "Authorization"],
-    "maxAge": 86400
-  }
-}

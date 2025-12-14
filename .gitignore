@@ -13,6 +13,8 @@ dist-ssr
 coverage
 *.local
 
+pb_data
+
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -25,13 +27,6 @@ coverage
 *.tsbuildinfo
 
 .eslintcache
-
-/cypress/videos/
-/cypress/screenshots/
-
-__screenshots__/
-
-launcher/build/bin
 
 auto-imports.d.ts
 components.d.ts

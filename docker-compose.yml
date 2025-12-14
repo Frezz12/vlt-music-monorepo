@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # :ro - только для чтения (безопасность)
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    restart: always # Перезапуск при падении
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      # Важно: Чтобы Nuxt мог делать запросы к бэкенду внутри Docker (SSR)
+      - NUXT_PUBLIC_API_BASE=http://backend:8090
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "8090:8090"
+    environment:
+      - GO_ENV=production
+    volumes:
+      # ИЗМЕНЕНИЕ: Теперь база сохраняется в папку вашего проекта
+      # Это позволит вам видеть файлы data.db и делать бекапы
+      - ./backend/pb_data:/app/pb_data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+# Секция volumes внизу больше не нужна, так как мы используем папку

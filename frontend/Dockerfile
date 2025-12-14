@@ -1,42 +1,23 @@
-# Frontend Dockerfile
-FROM oven/bun:1-alpine AS builder
+# -------- Build --------
+FROM oven/bun:1.3 AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json bun.lockb ./
-
-# Install dependencies
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-# Copy source code
 COPY . .
+RUN bun run build
 
-# Generate types and build
-RUN bun typegen && bun run build
-
-# Production stage
-FROM oven/bun:1-alpine AS runner
+# -------- Runtime --------
+FROM oven/bun:1.3 AS runner
 
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy package files
-COPY package.json bun.lockb ./
-
-# Install only production dependencies
-RUN bun install --frozen-lockfile --production
-
-# Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/.output ./.output
-
-# Set permissions
-RUN mkdir -p /app/.output && chown -R nextjs:nodejs /app/.output
-
-USER nextjs
+# ❗ Копируем И .output, И node_modules
+COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 

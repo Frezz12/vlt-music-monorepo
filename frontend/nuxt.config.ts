@@ -15,6 +15,13 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  nitro: {
+    preset: 'bun',
+    externals: {
+      inline: ['ofetch']
+    }
+  },
+
   css: ['~/assets/css/main.css'],
 
   routeRules: {

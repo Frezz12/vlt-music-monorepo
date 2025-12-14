@@ -27,15 +27,11 @@ export const usePocketBase = () => pbClient;
 
 export const useAuthenticated = () => {
   const auth = useAuth();
-  console.log("Sdassss")
 
   watch(auth.isValid, () => {
     if (auth.isValid.value) {
-      console.log("VAlid")
       return
     }
-    console.log("No VAlid")
-
     navigateTo('/auth/login');
   })
 };

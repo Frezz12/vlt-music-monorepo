@@ -12,6 +12,30 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+<<<<<<< HEAD
+=======
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: false
+        tags: vlt-music-backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: false
+        tags: vlt-music-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -20,6 +44,7 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT || 22 }}
         script: |
+<<<<<<< HEAD
           # Install Docker and Docker Compose if not installed
           if ! command -v docker &> /dev/null; then
             curl -fsSL https://get.docker.com -o get-docker.sh
@@ -42,11 +67,19 @@ jobs:
             git clone https://github.com/Frezz12/vlt-music-monorepo.git .
           fi
           
+=======
+          cd /opt/vlt-music
+          
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
           # Pull latest changes
           git pull origin test-realese
           
           # Stop existing containers
+<<<<<<< HEAD
           docker-compose down || true
+=======
+          docker-compose down
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
           
           # Build images on server
           docker-compose build --no-cache
