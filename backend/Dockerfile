@@ -1,37 +1,37 @@
-# Backend Dockerfile
+# Backend Dockerfile для PocketBase
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-# Copy go mod files
-COPY go.mod go.sum ./
+# Установите зависимости для сборки
+RUN apk add --no-cache git
 
-# Download dependencies
-RUN go mod download
-
-# Copy source code
+# Копируем исходный код
 COPY . .
 
-# Build with CGO disabled (для Alpine)
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+# Собираем PocketBase
+RUN go build -o main .
 
 # Production stage
 FROM alpine:latest
 
 WORKDIR /app
 
-# # Install CA certificates for HTTPS (если нужно)
-# RUN apk --no-cache add ca-certificates
+# Создаем пользователя внутри контейнера
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
 
-# Copy binary
-COPY --from=builder /app/main .
+# Устанавливаем зависимости времени выполнения
+RUN apk --no-cache add ca-certificates
 
-# # Create non-root user
-# RUN addgroup -g 1001 -S appgroup && \
-#     adduser -u 1001 -S appuser -G appgroup
+# Копируем бинарник
+COPY --from=builder --chown=appuser:appgroup /app/main .
+
+# Создаем директорию для данных
+RUN mkdir -p /app/pb_data && chown -R appuser:appgroup /app/pb_data
 
 USER appuser
 
-EXPOSE 8080
+EXPOSE 8090
 
 CMD ["./main", "serve", "--http=0.0.0.0:8090"]
