@@ -51,16 +51,17 @@ RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     chown -R appuser:appgroup /app
 
-# Expose port
-EXPOSE 80
+# Expose port for Docploy
+EXPOSE 3000
 
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'chmod -R 777 ./app/backend' >> /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
     echo 'cd /app/backend && ./main serve --http=0.0.0.0:8090 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting frontend..."' >> /start.sh && \
-    echo 'cd /app/frontend && HOST=0.0.0.0 PORT=3000 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
+    echo 'cd /app/frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting nginx..."' >> /start.sh && \
     echo 'nginx -g "daemon off;" &' >> /start.sh && \
