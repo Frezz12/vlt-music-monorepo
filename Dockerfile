@@ -28,8 +28,7 @@ RUN bun run build
 # -------- Final Runtime --------
 FROM alpine:latest
 
-# Install nginx and required packages
-// 👇 Установлен nodejs для запуска собранного фронтенда и созданы нужные папки для nginx
+# Install nginx, nodejs and create nginx directories
 RUN apk add --no-cache nginx ca-certificates nodejs && \
     mkdir -p /var/lib/nginx/tmp /var/lib/nginx/logs
 
@@ -49,15 +48,14 @@ COPY --from=frontend-builder /app/frontend/package.json /app/frontend/
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Create non-root user and give it permissions
-// 👇 Пользователю appuser даны права на папки nginx
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     chown -R appuser:appgroup /app /var/lib/nginx
 
-# Важно: Используйте порт, который вы укажете в nginx.conf (например, 8080)
+# Important: Use the port you specified in nginx.conf (e.g., 8080)
 EXPOSE 8080
 
-# Создаем исправленный стартовый скрипт
+# Create fixed startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'chmod -R 777 ./app/backend/pb_data 2>/dev/null' >> /start.sh && \
     echo 'echo "Starting backend (PocketBase)..."' >> /start.sh && \
