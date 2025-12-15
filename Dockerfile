@@ -24,7 +24,7 @@ RUN bun run build
 #####################################
 # FINAL IMAGE #
 #####################################
-FROM alpine:latest
+FROM oven/bun:1.3-alpine
 WORKDIR /app
 
 # Install nginx and required packages
@@ -47,6 +47,13 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
+RUN mkdir -p /tmp/nginx/client_body \
+             /tmp/nginx/proxy \
+             /tmp/nginx/fastcgi \
+             /tmp/nginx/uwsgi \
+             /tmp/nginx/scgi && \
+    chown -R appuser:appgroup /tmp/nginx
+
 # Create non-root user and add to nginx group
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
@@ -55,7 +62,7 @@ RUN addgroup -g 1001 -S appgroup && \
     chown -R nginx:nginx /var/lib/nginx
 
 # Expose port for Docploy
-EXPOSE 3000
+EXPOSE 8080
 
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
@@ -72,6 +79,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'trap "echo Stopping services...; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
     echo 'wait' >> /start.sh && \
     chmod +x /start.sh
+
 
 USER appuser
 
