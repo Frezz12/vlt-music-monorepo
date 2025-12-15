@@ -65,6 +65,10 @@ RUN mkdir -p /tmp/nginx/client_body \
              /tmp/nginx/scgi && \
     chown -R appuser:appgroup /tmp/nginx
 
+RUN apk add --no-cache nginx ca-certificates && \
+    mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
+    chown -R nginx:nginx /var/lib/nginx
+
 RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
