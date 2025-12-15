@@ -28,7 +28,9 @@ FROM alpine:latest
 WORKDIR /app
 
 # Install nginx and required packages
-RUN apk add --no-cache nginx ca-certificates
+RUN apk add --no-cache nginx ca-certificates && \
+    mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
+    chown -R nginx:nginx /var/lib/nginx
 
 # Copy backend binary
 COPY --from=build-backend /app/dist/main.bin ./
@@ -45,10 +47,12 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
-# Create non-root user
+# Create non-root user and add to nginx group
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
-    chown -R appuser:appgroup /app
+    addgroup appuser nginx && \
+    chown -R appuser:appgroup /app && \
+    chown -R nginx:nginx /var/lib/nginx
 
 # Expose port for Docploy
 EXPOSE 3000
@@ -62,7 +66,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting nginx..."' >> /start.sh && \
-    echo 'nginx -g "daemon off;" &' >> /start.sh && \
+    echo 'nginx -g "daemon off; error_log /dev/stdout warn;" &' >> /start.sh && \
     echo 'NGINX_PID=$!' >> /start.sh && \
     echo 'echo "All services started. Waiting for termination..."' >> /start.sh && \
     echo 'trap "echo Stopping services...; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
