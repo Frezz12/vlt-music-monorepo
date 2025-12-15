@@ -47,12 +47,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
-RUN mkdir -p /tmp/nginx/client_body \
-             /tmp/nginx/proxy \
-             /tmp/nginx/fastcgi \
-             /tmp/nginx/uwsgi \
-             /tmp/nginx/scgi && \
-    chown -R appuser:appgroup /tmp/nginx
 
 # Create non-root user and add to nginx group
 RUN addgroup -g 1001 -S appgroup && \
@@ -63,6 +57,14 @@ RUN addgroup -g 1001 -S appgroup && \
 
 # Expose port for Docploy
 EXPOSE 8080
+
+RUN mkdir -p /tmp/nginx/client_body \
+             /tmp/nginx/proxy \
+             /tmp/nginx/fastcgi \
+             /tmp/nginx/uwsgi \
+             /tmp/nginx/scgi && \
+    chown -R appuser:appgroup /tmp/nginx
+
 
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
