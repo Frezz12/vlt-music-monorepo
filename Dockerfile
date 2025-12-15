@@ -65,7 +65,7 @@ RUN mkdir -p /tmp/nginx/client_body \
              /tmp/nginx/scgi && \
     chown -R appuser:appgroup /tmp/nginx
 
-
+RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
@@ -75,7 +75,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting nginx..."' >> /start.sh && \
-    echo 'nginx -g "daemon off; error_log /dev/stdout warn;" &' >> /start.sh && \
+    echo 'nginx -g "daemon off; pid /tmp/nginx.pid; error_log /dev/stderr warn;" &' >> /start.sh && \
     echo 'NGINX_PID=$!' >> /start.sh && \
     echo 'echo "All services started. Waiting for termination..."' >> /start.sh && \
     echo 'trap "echo Stopping services...; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
