@@ -56,7 +56,7 @@ EXPOSE 3000
 
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'chmod -R 777 ./app/backend' >> /start.sh && \
+    echo 'chmod -R 777 ./app/backend/pb_data' >> /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
     echo 'cd /app/backend && ./main serve --http=0.0.0.0:8090 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
