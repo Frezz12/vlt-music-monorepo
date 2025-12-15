@@ -73,6 +73,7 @@ RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
+    echo 'chmod -R 777 ./backend/pb_data' >> /start.sh && \
     echo './main.bin serve --http=0.0.0.0:8090 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting frontend..."' >> /start.sh && \
