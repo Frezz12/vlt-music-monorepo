@@ -36,7 +36,7 @@ RUN mkdir -p /app/backend/pb_data /app/frontend
 
 # Copy backend binary
 COPY --from=backend-builder /app/backend/main /app/backend/
-RUN chown +x /app/backend/main
+RUN chmod +x /app/backend/main
 
 # Copy frontend build
 COPY --from=frontend-builder /app/frontend/.output /app/frontend/.output
