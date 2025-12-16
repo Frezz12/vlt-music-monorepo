@@ -78,32 +78,56 @@ RUN mkdir -p /tmp/nginx/client_body \
 RUN sed -i 's|error_log .*;|error_log /dev/stderr warn;|' /etc/nginx/nginx.conf && \
     sed -i 's|access_log .*;|access_log /dev/stdout main;|' /etc/nginx/nginx.conf
 
+RUN echo '<html><body><h1>Test Page</h1><p>If you see this, nginx works!</p></body></html>' > /app/test.html
+
+
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo '' >> /start.sh && \
-    echo 'echo "Starting backend..."' >> /start.sh && \
+    echo 'echo "=== STARTING APPLICATION ==="' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo '# Запускаем backend' >> /start.sh && \
+    echo 'echo "1. Starting backend (PocketBase)..."' >> /start.sh && \
     echo 'chmod -R 777 ./pb_data' >> /start.sh && \
-    echo './main.bin serve --http=0.0.0.0:8090 &' >> /start.sh && \
+    echo './main.bin serve --http=0.0.0.0:8090 > /tmp/backend.log 2>&1 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
+    echo 'sleep 2' >> /start.sh && \
     echo '' >> /start.sh && \
-    echo 'echo "Starting frontend..."' >> /start.sh && \
-    echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production bun .output/server/index.mjs &' >> /start.sh && \
+    echo '# Запускаем frontend' >> /start.sh && \
+    echo 'echo "2. Starting frontend (Nuxt)..."' >> /start.sh && \
+    echo 'cd frontend' >> /start.sh && \
+    echo 'HOST=0.0.0.0 PORT=3001 NODE_ENV=production bun .output/server/index.mjs > /tmp/frontend.log 2>&1 &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
+    echo 'sleep 5' >> /start.sh && \
     echo '' >> /start.sh && \
-    echo 'echo "Waiting 3 seconds for services to start..."' >> /start.sh && \
-    echo 'sleep 3' >> /start.sh && \
+    echo '# Проверяем, что сервисы работают' >> /start.sh && \
+    echo 'echo "3. Checking services..."' >> /start.sh && \
+    echo 'if curl -s http://127.0.0.1:8090/api/ > /dev/null; then' >> /start.sh && \
+    echo '  echo "   ✓ Backend is running on port 8090"' >> /start.sh && \
+    echo 'else' >> /start.sh && \
+    echo '  echo "   ✗ Backend failed to start"' >> /start.sh && \
+    echo '  cat /tmp/backend.log' >> /start.sh && \
+    echo 'fi' >> /start.sh && \
     echo '' >> /start.sh && \
-    echo 'echo "Starting nginx..."' >> /start.sh && \
-    # Запускаем nginx от имени пользователя nginx
-    echo 'nginx -c /etc/nginx/nginx.conf -g "daemon off; user nginx appgroup;" &' >> /start.sh && \
+    echo 'if curl -s http://127.0.0.1:3001 > /dev/null; then' >> /start.sh && \
+    echo '  echo "   ✓ Frontend is running on port 3001"' >> /start.sh && \
+    echo 'else' >> /start.sh && \
+    echo '  echo "   ✗ Frontend failed to start"' >> /start.sh && \
+    echo '  cat /tmp/frontend.log' >> /start.sh && \
+    echo 'fi' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo '# Запускаем nginx' >> /start.sh && \
+    echo 'echo "4. Starting nginx..."' >> /start.sh && \
+    echo 'nginx -g "daemon off; error_log /dev/stderr warn;" &' >> /start.sh && \
     echo 'NGINX_PID=$!' >> /start.sh && \
     echo '' >> /start.sh && \
-    echo 'echo "All services started successfully!"' >> /start.sh && \
-    echo 'echo "Backend PID: $BACKEND_PID"' >> /start.sh && \
-    echo 'echo "Frontend PID: $FRONTEND_PID"' >> /start.sh && \
-    echo 'echo "Nginx PID: $NGINX_PID"' >> /start.sh && \
+    echo 'echo ""' >> /start.sh && \
+    echo 'echo "=== ALL SERVICES STARTED ==="' >> /start.sh && \
+    echo 'echo "Backend:  http://localhost:8090"' >> /start.sh && \
+    echo 'echo "Frontend: http://localhost:3001"' >> /start.sh && \
+    echo 'echo "Nginx:    http://localhost:80 (proxy)"' >> /start.sh && \
     echo '' >> /start.sh && \
-    echo 'trap "echo \"Stopping services...\"; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
+    echo 'trap "echo \"Shutting down...\"; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID 2>/dev/null; exit 0" TERM INT' >> /start.sh && \
     echo '' >> /start.sh && \
     echo 'wait' >> /start.sh && \
     chmod +x /start.sh
