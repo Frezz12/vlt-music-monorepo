@@ -27,36 +27,26 @@ RUN bun run build
 FROM oven/bun:1.3-alpine
 WORKDIR /app
 
-# Install nginx and required packages
 RUN apk add --no-cache nginx ca-certificates && \
     mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
     chown -R nginx:nginx /var/lib/nginx
 
-# Copy backend binary
 COPY --from=build-backend /app/dist/main.bin ./
 RUN chmod +x ./main.bin
 
-# Copy frontend build
 COPY --from=build-frontend /app/.output ./frontend/.output
 COPY --from=build-frontend /app/node_modules ./frontend/node_modules
 COPY --from=build-frontend /app/package.json ./frontend/
 
-# Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Create data directory for backend
-RUN mkdir -p ./pb_data
-
-
-# Create non-root user and add to nginx group
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     addgroup appuser nginx && \
     chown -R appuser:appgroup /app && \
     chown -R nginx:nginx /var/lib/nginx
 
-# Expose port for Docploy
-EXPOSE 8080
+EXPOSE 8090
 
 RUN mkdir -p /tmp/nginx/client_body \
              /tmp/nginx/proxy \
