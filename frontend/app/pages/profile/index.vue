@@ -124,7 +124,6 @@ const copyToClipboardFallback = (text: string) => {
 }
 
 onMounted(async () => {
-  
   try {
     haveLinks.value = await pb.collection("social_links").getFullList({
       filter: pb.authStore.record?.id ? `user = "${pb.authStore.record?.id}"` : ''
@@ -150,9 +149,13 @@ const handleSubmit = async () => {
     const formData = new FormData();
 
     if (user_update.value?.email && user_update.value?.nikname) {
+      console.log(user_update.value.email)
       formData.append('email', user_update.value.email);
-      formData.append('usename', user_update.value.nikname);
+      formData.append('nikname', user_update.value.nikname);
     }
+
+      console.log()
+    
 
     const updatedUser = await pb.collection('users').update(
       user.value?.id!,
@@ -184,6 +187,7 @@ const handleSubmit = async () => {
       }
     }
     console.log('User успешно обнавленн!', updatedUser);
+
     location.reload();
   } catch (error) {
     console.log(error);
@@ -279,7 +283,6 @@ const handleLogout = async () => {
                     </div>
                   </div>
                 </div>
-                <h1>TEST DEPLOY!!</h1>
               </div>
             </div>
           </div>

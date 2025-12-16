@@ -67,20 +67,18 @@ const getIndex = () => {
         isFullScreen ? 'h-screen' : 'h-[calc(100vh-65px)]',
       ]"
     >
-      <img
+      <NuxtImg
         :src="urlCover[currentSlideIndex]"
         alt="Background"
         class="absolute h-full w-full object-cover blur-xl scale-200 opacity-30 light:opacity-70"
       />
       <div class="relative z-10 flex h-full justify-center items-center">
         <div class="flex flex-col items-center">
-          <div class="">
-            <NuxtLink to="/links">
+          <div class="w-[300px] h-[300px]">
               <NuxtImg
-                class="w-[250px] sm:w-[400px] rounded-3xl hover:opacity-90 cursor-pointer transition-all border border-white/20"
+                class="w-full h-full rounded-3xl hover:opacity-90 transition-all border border-white/20"
                 :src="urlCover[currentSlideIndex]"
               />
-            </NuxtLink>
           </div>
           <div class="flex flex-col justify-center items-center pt-4">
             <p

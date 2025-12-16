@@ -12,6 +12,7 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	Draft = "draft",
+	Genres = "genres",
 	LastReleases = "last_releases",
 	MediadiceToken = "mediadice_token",
 	Promocodes = "promocodes",
@@ -106,6 +107,13 @@ export type DraftRecord = {
 	updated: IsoAutoDateString
 }
 
+export type GenresRecord = {
+	created: IsoAutoDateString
+	genre?: string
+	id: string
+	updated: IsoAutoDateString
+}
+
 export type LastReleasesRecord = {
 	artist?: string
 	cover?: FileNameString
@@ -167,6 +175,7 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type DraftResponse<Texpand = unknown> = Required<DraftRecord> & BaseSystemFields<Texpand>
+export type GenresResponse<Texpand = unknown> = Required<GenresRecord> & BaseSystemFields<Texpand>
 export type LastReleasesResponse<Texpand = unknown> = Required<LastReleasesRecord> & BaseSystemFields<Texpand>
 export type MediadiceTokenResponse<Texpand = unknown> = Required<MediadiceTokenRecord> & BaseSystemFields<Texpand>
 export type PromocodesResponse<Texpand = unknown> = Required<PromocodesRecord> & BaseSystemFields<Texpand>
@@ -182,6 +191,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	draft: DraftRecord
+	genres: GenresRecord
 	last_releases: LastReleasesRecord
 	mediadice_token: MediadiceTokenRecord
 	promocodes: PromocodesRecord
@@ -196,6 +206,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	draft: DraftResponse
+	genres: GenresResponse
 	last_releases: LastReleasesResponse
 	mediadice_token: MediadiceTokenResponse
 	promocodes: PromocodesResponse
