@@ -72,7 +72,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo './main.bin serve --http=0.0.0.0:8090 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting frontend..."' >> /start.sh && \
-    echo 'cd frontend && HOST=0.0.0.0 PORT=3000 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
+    echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
     echo 'echo "Starting nginx..."' >> /start.sh && \
     echo 'nginx -g "daemon off; pid /tmp/nginx.pid; error_log /dev/stderr warn;" &' >> /start.sh && \
