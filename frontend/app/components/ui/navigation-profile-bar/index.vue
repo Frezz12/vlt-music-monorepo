@@ -11,7 +11,6 @@ const items = ref<NavigationMenuItem[][]>([
       label: "Профиль",
       icon: "solar:user-broken",
       to: "/profile",
-      active: true,
       defaultOpen: true,
       children: [
         {

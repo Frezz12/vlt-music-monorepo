@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"os"
 
+	_ "main/migrations"
+
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"

@@ -43,7 +43,7 @@ const deleteDraft = async (id: string) => {
                     <div class="flex items-center
                     ">
                         <div v-if="item.logo" class="w-16 h-16 ">
-                            <NuxtImg class="rounded-xl" :src="pb.files.getURL(item, item.logo!)" />
+                            <NuxtImg class="rounded-xl w-full h-full" :src="pb.files.getURL(item, item.logo!)" />
                         </div>
                         <div v-else class="w-16 h-16 flex items-center justify-center 
                     rounded-xl bg-white/20">
