@@ -48,11 +48,11 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo '' >> /start.sh && \
     echo '# Запускаем frontend' >> /start.sh && \
     echo 'cd frontend' >> /start.sh && \
-    echo 'HOST=0.0.0.0 PORT=3001 NODE_ENV=production bun .output/server/index.mjs &' >> /start.sh && \
+    echo 'HOST=0.0.0.0 NODE_ENV=production bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
     echo '' >> /start.sh && \
     echo 'echo "Backend: http://0.0.0.0:8090"' >> /start.sh && \
-    echo 'echo "Frontend: http://0.0.0.0:3001"' >> /start.sh && \
+    echo 'echo "Frontend: http://0.0.0.0:3000"' >> /start.sh && \
     echo '' >> /start.sh && \
     echo '# Ждем сигнала завершения' >> /start.sh && \
     echo 'trap "kill $BACKEND_PID $FRONTEND_PID; exit" TERM INT' >> /start.sh && \
