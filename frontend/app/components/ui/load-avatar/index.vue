@@ -82,11 +82,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     return
   }
 
-  // console.log('Avatar file:', avatarFile)
-  // console.log('File name:', avatarFile.name)
-  // console.log('File size:', avatarFile.size)
-  // console.log('File type:', avatarFile.type)
-
   try {
     await uploadAvatarToServer(avatarFile)
   } catch (error) {

@@ -47,8 +47,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
-
-# Create non-root user and add to nginx group
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     addgroup appuser nginx && \
@@ -86,7 +84,6 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'trap "echo Stopping services...; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
     echo 'wait' >> /start.sh && \
     chmod +x /start.sh
-
 
 USER appuser
 
