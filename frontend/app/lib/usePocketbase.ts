@@ -2,7 +2,7 @@ import PocketBase from "pocketbase";
 import { type TypedPocketBase, type UsersRecord } from "./pocketbase-types";
 import { computed, onUnmounted, reactive, ref, watch } from "vue";
 
-const pbClient = new PocketBase("http://localhost:8090") as TypedPocketBase;
+const pbClient = new PocketBase("http://82.117.87.86:8090") as TypedPocketBase;
 
 pbClient.autoCancellation(false)
 
