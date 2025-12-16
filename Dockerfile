@@ -40,12 +40,9 @@ COPY --from=build-frontend /app/package.json ./frontend/
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-<<<<<<< HEAD
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
-=======
->>>>>>> c6c8a04446e9e010f211af1deceaaa23c92fe5b4
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     addgroup appuser nginx && \
@@ -61,11 +58,13 @@ RUN mkdir -p /tmp/nginx/client_body \
              /tmp/nginx/scgi && \
     chown -R appuser:appgroup /tmp/nginx
 
-RUN apk add --no-cache nginx ca-certificates && \
-    mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
-    chown -R nginx:nginx /var/lib/nginx
+# Строки ниже дублируются, можно удалить (они уже есть выше)
+# RUN apk add --no-cache nginx ca-certificates && \
+#     mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
+#     chown -R nginx:nginx /var/lib/nginx
 
-RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
+# RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
+
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
