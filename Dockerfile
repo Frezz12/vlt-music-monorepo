@@ -58,27 +58,32 @@ RUN mkdir -p /tmp/nginx/client_body \
              /tmp/nginx/scgi && \
     chown -R appuser:appgroup /tmp/nginx
 
-# Строки ниже дублируются, можно удалить (они уже есть выше)
-# RUN apk add --no-cache nginx ca-certificates && \
-#     mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp && \
-#     chown -R nginx:nginx /var/lib/nginx
-
-# RUN mkdir -p /tmp/nginx && chown -R appuser:appgroup /tmp/nginx
-
 # Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
+    echo '' >> /start.sh && \
     echo 'echo "Starting backend..."' >> /start.sh && \
-    echo 'chmod -R 777 ./backend/pb_data' >> /start.sh && \
+    echo 'chmod -R 777 ./pb_data' >> /start.sh && \
     echo './main.bin serve --http=0.0.0.0:8090 &' >> /start.sh && \
     echo 'BACKEND_PID=$!' >> /start.sh && \
+    echo '' >> /start.sh && \
     echo 'echo "Starting frontend..."' >> /start.sh && \
-    echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production NUXT_PUBLIC_API_BASE=http://localhost:8090 bun .output/server/index.mjs &' >> /start.sh && \
+    echo 'cd frontend && HOST=0.0.0.0 PORT=3001 NODE_ENV=production bun .output/server/index.mjs &' >> /start.sh && \
     echo 'FRONTEND_PID=$!' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo 'echo "Waiting 3 seconds for services to start..."' >> /start.sh && \
+    echo 'sleep 3' >> /start.sh && \
+    echo '' >> /start.sh && \
     echo 'echo "Starting nginx..."' >> /start.sh && \
     echo 'nginx -g "daemon off; pid /tmp/nginx.pid; error_log /dev/stderr warn;" &' >> /start.sh && \
     echo 'NGINX_PID=$!' >> /start.sh && \
-    echo 'echo "All services started. Waiting for termination..."' >> /start.sh && \
-    echo 'trap "echo Stopping services...; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo 'echo "All services started successfully!"' >> /start.sh && \
+    echo 'echo "Backend PID: $BACKEND_PID"' >> /start.sh && \
+    echo 'echo "Frontend PID: $FRONTEND_PID"' >> /start.sh && \
+    echo 'echo "Nginx PID: $NGINX_PID"' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo 'trap "echo \"Stopping services...\"; kill $BACKEND_PID $FRONTEND_PID $NGINX_PID; exit" TERM INT' >> /start.sh && \
+    echo '' >> /start.sh && \
     echo 'wait' >> /start.sh && \
     chmod +x /start.sh
 

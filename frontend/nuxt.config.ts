@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+
   nitro: {
     preset: 'bun',
     externals: {
