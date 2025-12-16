@@ -40,12 +40,9 @@ COPY --from=build-frontend /app/package.json ./frontend/
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-<<<<<<< HEAD
 # Create data directory for backend
 RUN mkdir -p ./pb_data
 
-=======
->>>>>>> c6c8a04446e9e010f211af1deceaaa23c92fe5b4
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     addgroup appuser nginx && \
