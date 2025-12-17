@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import ProfileLayout from "@/layouts/profile.vue";
 import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+import type { FormSubmitEvent, SelectItem } from '@nuxt/ui'
 import type { DraftRecord, GenresRecord, UsersRecord } from "~/lib/pocketbase-types";
 import { usePocketBase } from "~/lib/usePocketbase";
-import { CalendarDate } from '@internationalized/date'
+import { CalendarDate, type DateValue } from '@internationalized/date'
 
 const route = useRoute()
 
@@ -22,11 +22,36 @@ const draftEdit = ref<DraftRecord | null>(null)
 const inputDateRef = useTemplateRef('inputDateRef')
 const modelValue = shallowRef(new CalendarDate(2022, 1, 10))
 const genre = ref<string[]>([])
-const selectGenre = ref<string>('')
+const isSave = ref<boolean>(false)
 
 const inviteArtist = ref<string[]>([''])
 
 const isOpenModalLogo = ref<boolean>(false)
+
+const stateDraft = reactive({
+  realeseName: '',
+  version: '',
+  releaseData: '',
+  genre: '',
+  upc: '',
+  copiright: '',
+  mainArtistId: '',
+  invateArtist: ''
+})
+
+watch(modelValue, (newDate) => {
+  if (newDate) {
+    stateDraft.releaseData = newDate.toString()
+  } else {
+    stateDraft.releaseData = ''
+  }
+}, { immediate: true })
+
+watch(inviteArtist.value, () => {
+  stateDraft.invateArtist = inviteArtist.value.toString()
+})
+
+
 
 onMounted(async () => {
   try {
@@ -152,11 +177,48 @@ const openModalLogo = () => {
   isOpenModalLogo.value = !isOpenModalLogo.value
 }
 
-const handleCreateDraft = async (data: {
-  urlLogo: File,
+const handleSaveChangeDraft = async (data: {
+  realeseName: string,
+  version: string,
+  releaseData: string,
+  genre: string,
+  upc: string,
+  copiright: string,
+  mainArtistId: string,
+  invateArtist: string
 }) => {
   const formData = new FormData()
 
+  formData.append('title', data.realeseName)
+  formData.append('version', data.version)
+  formData.append('realese_data', data.releaseData)
+  formData.append('genre', data.genre)
+  formData.append('upc', data.upc)
+  formData.append('copiright', data.copiright)
+  formData.append('main_artist', data.mainArtistId)
+  formData.append('invite_artist', data.invateArtist)
+
+  try {
+
+    await pb.collection('draft').update(
+      draftID.value,
+      formData
+    )
+
+    draft.value = await pb.collection('draft').getOne(draftID.value)
+
+    stateDraft.realeseName = draft.value?.realeseName!
+    stateDraft.version = draft.value?.version!
+    stateDraft.releaseData = draft.value?.realese_data!
+    stateDraft.genre = draft.value?.genre!
+    stateDraft.upc = draft.value?.upc!
+    stateDraft.copiright = draft.value?.copiright!
+    stateDraft.mainArtistId = draft.value?.main_artist!
+    stateDraft.invateArtist = draft.value?.invate_artist!
+
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 onMounted(async () => {
@@ -171,14 +233,6 @@ onMounted(async () => {
     console.log(err)
   }
 })
-
-watch(selectGenre, () => {
-  console.log(selectGenre.value)
-})
-
-const addInviteArtist = () => {
-
-}
 
 watch(inviteArtist, (newVal) => {
   if (newVal && newVal.length > 0 && newVal[newVal.length - 1]?.trim() !== '') {
@@ -195,6 +249,8 @@ function cleanupArtists() {
     return artist?.trim() !== '';
   });
 }
+
+
 
 </script>
 
@@ -234,10 +290,10 @@ function cleanupArtists() {
           <div class="flex flex-col gap-5 w-full pt-2">
             <div class="flex justify-between w-full">
               <UFormField class="w-full max-w-[500px]" size="xl" label="Название релиза">
-                <UInput placeholder="" class="w-full" />
+                <UInput v-model="stateDraft.realeseName" placeholder="" class="w-full" />
               </UFormField>
               <UFormField class="w-full max-w-[500px]" size="xl" label="Версия">
-                <UInput placeholder="" class="w-full" />
+                <UInput v-model="stateDraft.version" placeholder="" class="w-full" />
               </UFormField>
             </div>
             <div class="flex justify-between w-full">
@@ -255,34 +311,43 @@ function cleanupArtists() {
                 </UInputDate>
               </UFormField>
               <UFormField class="w-full max-w-[500px]" size="xl" label="Жанр">
-                <USelect v-model="selectGenre" class="w-[500px]" placeholder="Select status" :items="genre" />
+                <USelect v-model="stateDraft.genre" class="w-[500px]" placeholder="Select status" :items="genre" />
               </UFormField>
             </div>
             <div class="flex justify-between w-full">
               <UFormField class="w-full max-w-[500px]" size="xl" label="UPC (опционально)">
-                <UInput placeholder="" class="w-full" />
+                <UInput v-model="stateDraft.upc" placeholder="" class="w-full" />
               </UFormField>
               <UFormField class="w-full max-w-[500px]" size="xl" label="Копирайт">
-                <UInput placeholder="" class="w-full" />
+                <UInput v-model="stateDraft.copiright" placeholder="" class="w-full" />
               </UFormField>
             </div>
             <div class="flex justify-between w-full">
               <UFormField class="w-full" size="xl" label="Основной артист">
-                <UInput placeholder="" class="w-full" />
+                <div class="w-full pt-2 flex items-center">
+                  <UInput v-model="stateDraft.mainArtistId" placeholder="" class="w-full" />
+                </div>
               </UFormField>
             </div>
             <div class="flex flex-col justify-between w-full">
               <UFormField class="w-full" size="xl" label="Приглашенный артисты">
                 <div class="w-full pt-2 flex items-center" v-for="(artist, index) in inviteArtist" :key="index">
                   <UInput v-model="inviteArtist[index]" placeholder="" class="w-full" />
-                  <UButton class="ml-2" v-if="inviteArtist.length > 1 && index !== inviteArtist.length - 1" icon="solar:trash-bin-2-broken"
-                    variant="outline" color="error" @click="inviteArtist.splice(index, 1)" />
+                  <UButton class="ml-2" v-if="inviteArtist.length > 1 && index !== inviteArtist.length - 1"
+                    icon="solar:trash-bin-2-broken" variant="outline" color="error"
+                    @click="inviteArtist.splice(index, 1)" />
                 </div>
-
               </UFormField>
             </div>
-            <div class="">
-
+            <div class="flex flex-row justify-between">
+              <div class="">
+                              <UButton @click="console.log(stateDraft)" size="xl" class="w-[200px] flex justify-center cursor-pointer" label="Сохранить" 
+                :trailing="true" variant="solid" color="primary" />
+              </div>
+              <div class="">
+                              <UButton @click="console.log(stateDraft)" size="xl" class="cursor-pointer" label="Далее" icon="solar:alt-arrow-right-broken"
+                :trailing="true" variant="outline" color="primary" />
+              </div>
             </div>
           </div>
         </div>
