@@ -11,7 +11,6 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
-	Artist = "artist",
 	Draft = "draft",
 	Genres = "genres",
 	LastReleases = "last_releases",
@@ -99,14 +98,6 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ArtistRecord = {
-	artist_name?: string
-	created: IsoAutoDateString
-	id: string
-	updated: IsoAutoDateString
-	user?: RecordIdString[]
-}
-
 export type DraftRecord = {
 	author?: RecordIdString
 	copiright?: string
@@ -116,9 +107,8 @@ export type DraftRecord = {
 	invate_artist?: string
 	logo?: FileNameString
 	main_artist?: string
-	realeseName?: string
 	realese_data?: IsoDateString
-	title?: string
+	realese_name?: string
 	upc?: string
 	updated: IsoAutoDateString
 	version?: string
@@ -191,7 +181,6 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ArtistResponse<Texpand = unknown> = Required<ArtistRecord> & BaseSystemFields<Texpand>
 export type DraftResponse<Texpand = unknown> = Required<DraftRecord> & BaseSystemFields<Texpand>
 export type GenresResponse<Texpand = unknown> = Required<GenresRecord> & BaseSystemFields<Texpand>
 export type LastReleasesResponse<Texpand = unknown> = Required<LastReleasesRecord> & BaseSystemFields<Texpand>
@@ -208,7 +197,6 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
-	artist: ArtistRecord
 	draft: DraftRecord
 	genres: GenresRecord
 	last_releases: LastReleasesRecord
@@ -224,7 +212,6 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
-	artist: ArtistResponse
 	draft: DraftResponse
 	genres: GenresResponse
 	last_releases: LastReleasesResponse

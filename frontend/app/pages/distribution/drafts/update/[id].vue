@@ -51,7 +51,9 @@ watch(inviteArtist.value, () => {
   stateDraft.invateArtist = inviteArtist.value.toString()
 })
 
-
+const inviteArtistToSting = () => {
+  return inviteArtist.value.toString()
+}
 
 onMounted(async () => {
   try {
@@ -129,11 +131,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     return
   }
 
-  // console.log('Avatar file:', avatarFile)
-  // console.log('File name:', avatarFile.name)
-  // console.log('File size:', avatarFile.size)
-  // console.log('File type:', avatarFile.type)
-
   try {
     await uploadAvatarToServer(avatarFile)
   } catch (error) {
@@ -157,10 +154,9 @@ async function uploadAvatarToServer(file: File) {
       formData
     );
 
-    console.log('✅ Обложка успешно обновлена!', updatedUser);
     draft.value = await pb.collection('draft').getOne(draftID.value)
   } catch (error: any) {
-    console.error('❌ Ошибка загрузки:', error);
+    console.error('Ошибка загрузки:', error);
   }
 }
 
@@ -177,37 +173,28 @@ const openModalLogo = () => {
   isOpenModalLogo.value = !isOpenModalLogo.value
 }
 
-const handleSaveChangeDraft = async (data: {
-  realeseName: string,
-  version: string,
-  releaseData: string,
-  genre: string,
-  upc: string,
-  copiright: string,
-  mainArtistId: string,
-  invateArtist: string
-}) => {
+const handleSaveChangeDraft = async () => {
   const formData = new FormData()
 
-  formData.append('title', data.realeseName)
-  formData.append('version', data.version)
-  formData.append('realese_data', data.releaseData)
-  formData.append('genre', data.genre)
-  formData.append('upc', data.upc)
-  formData.append('copiright', data.copiright)
-  formData.append('main_artist', data.mainArtistId)
-  formData.append('invite_artist', data.invateArtist)
+  formData.append('realese_name', stateDraft.realeseName)
+  formData.append('version', stateDraft.version)
+  formData.append('realese_data', stateDraft.releaseData)
+  formData.append('genre', stateDraft.genre)
+  formData.append('upc', stateDraft.upc)
+  formData.append('copiright', stateDraft.copiright)
+  formData.append('main_artist', stateDraft.mainArtistId)
+  formData.append('invate_artist', inviteArtistToSting())
 
   try {
-
     await pb.collection('draft').update(
       draftID.value,
       formData
     )
 
     draft.value = await pb.collection('draft').getOne(draftID.value)
+    console.log(draft.value)
 
-    stateDraft.realeseName = draft.value?.realeseName!
+    stateDraft.realeseName = draft.value?.realese_name!
     stateDraft.version = draft.value?.version!
     stateDraft.releaseData = draft.value?.realese_data!
     stateDraft.genre = draft.value?.genre!
@@ -234,6 +221,30 @@ onMounted(async () => {
   }
 })
 
+onMounted(async ()=> {
+  
+  try {
+    draft.value = await pb.collection('draft').getOne(draftID.value)
+    console.log(draft.value)
+
+    stateDraft.realeseName = draft.value?.realese_name!
+    stateDraft.version = draft.value?.version!
+    stateDraft.releaseData = draft.value?.realese_data!
+    stateDraft.genre = draft.value?.genre!
+    stateDraft.upc = draft.value?.upc!
+    stateDraft.copiright = draft.value?.copiright!
+    stateDraft.mainArtistId = draft.value?.main_artist!
+    stateDraft.invateArtist = draft.value?.invate_artist!
+
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+watch(stateDraft, () => {
+  isSave.value = false
+})
+
 watch(inviteArtist, (newVal) => {
   if (newVal && newVal.length > 0 && newVal[newVal.length - 1]?.trim() !== '') {
     inviteArtist.value.push('');
@@ -250,13 +261,11 @@ function cleanupArtists() {
   });
 }
 
-
-
 </script>
 
 <template>
   <ProfileLayout>
-    <div class="pl-10">
+    <div class="pl-10 pb-10">
       <div class="flex w-[600px] lg:w-[1020px] justify-center">
         <div class="flex flex-col items-center gap-5 w-full">
           <p class="flex text-4xl">Загрузить релиз</p>
@@ -275,7 +284,7 @@ function cleanupArtists() {
               </template>
             </UModal>
           </div>
-          <div v-if="draft?.logo" class="w-[300px] h-[300px]">
+          <div v-if="draft?.logo" class="w-[250px] h-[250px]">
             <NuxtImg class="rounded-2xl w-full h-full" :src="pb.files.getURL(draft, draft.logo!)" />
           </div>
           <div v-else class="w-[300px] h-[300px] flex items-center justify-center 
@@ -341,11 +350,11 @@ function cleanupArtists() {
             </div>
             <div class="flex flex-row justify-between">
               <div class="">
-                              <UButton @click="console.log(stateDraft)" size="xl" class="w-[200px] flex justify-center cursor-pointer" label="Сохранить" 
+                              <UButton @click="handleSaveChangeDraft()" size="xl" class="w-[200px] flex justify-center cursor-pointer" label="Сохранить" 
                 :trailing="true" variant="solid" color="primary" />
               </div>
               <div class="">
-                              <UButton @click="console.log(stateDraft)" size="xl" class="cursor-pointer" label="Далее" icon="solar:alt-arrow-right-broken"
+                              <UButton @click="handleSaveChangeDraft()" size="xl" class="cursor-pointer" label="Далее" icon="solar:alt-arrow-right-broken"
                 :trailing="true" variant="outline" color="primary" />
               </div>
             </div>
