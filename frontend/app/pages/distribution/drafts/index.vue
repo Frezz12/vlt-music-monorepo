@@ -17,7 +17,7 @@ onMounted(async () => {
 })
 
 const openDraft = (id: string) => {
-    navigateTo(`/distribution/drafts/update/${id}`)
+    navigateTo(`/distribution/drafts/update/info/${id}`)
 }
 
 const deleteDraft = async (id: string) => {
@@ -51,7 +51,7 @@ const deleteDraft = async (id: string) => {
                         </div>
                         <div class="flex flex-1 items-center justify-between">
                             <div class="">
-                                <p class="pl-3 text-xl">{{ item.realeseName }}</p>
+                                <p class="pl-3 text-xl">{{ item.realese_name }}</p>
                             </div>
                             <div class="flex gap-2">
                                 <UButton @click="openDraft(item.id)" class=" cursor-pointer" icon="solar:eye-broken" size="md" color="primary" variant="soft" />

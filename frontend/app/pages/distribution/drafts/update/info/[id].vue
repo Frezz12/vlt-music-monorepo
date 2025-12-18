@@ -24,8 +24,6 @@ const modelValue = shallowRef(new CalendarDate(2022, 1, 10))
 const genre = ref<string[]>([])
 const isSave = ref<boolean>(false)
 
-const inviteArtist = ref<string[]>([''])
-
 const isOpenModalLogo = ref<boolean>(false)
 
 const stateDraft = reactive({
@@ -47,13 +45,6 @@ watch(modelValue, (newDate) => {
   }
 }, { immediate: true })
 
-watch(inviteArtist.value, () => {
-  stateDraft.invateArtist = inviteArtist.value.toString()
-})
-
-const inviteArtistToSting = () => {
-  return inviteArtist.value.toString()
-}
 
 onMounted(async () => {
   try {
@@ -183,7 +174,7 @@ const handleSaveChangeDraft = async () => {
   formData.append('upc', stateDraft.upc)
   formData.append('copiright', stateDraft.copiright)
   formData.append('main_artist', stateDraft.mainArtistId)
-  formData.append('invate_artist', inviteArtistToSting())
+  formData.append('invate_artist', stateDraft.invateArtist)
 
   try {
     await pb.collection('draft').update(
@@ -245,20 +236,8 @@ watch(stateDraft, () => {
   isSave.value = false
 })
 
-watch(inviteArtist, (newVal) => {
-  if (newVal && newVal.length > 0 && newVal[newVal.length - 1]?.trim() !== '') {
-    inviteArtist.value.push('');
-  }
-  console.log(inviteArtist.value)
-}, { deep: true });
-
-function cleanupArtists() {
-  if (!inviteArtist.value) return;
-
-  inviteArtist.value = inviteArtist.value.filter((artist, index) => {
-    if (index === inviteArtist.value!.length - 1) return true;
-    return artist?.trim() !== '';
-  });
+const next = () => {
+  navigateTo(`/distribution/drafts/update/loadfiles/${draftID.value}`)
 }
 
 </script>
@@ -286,23 +265,20 @@ function cleanupArtists() {
           </div>
           <div v-if="draft?.logo" class="w-[250px] h-[250px]">
             <NuxtImg class="rounded-2xl w-full h-full" :src="pb.files.getURL(draft, draft.logo!)" />
-          </div>
+          </div>  
           <div v-else class="w-[300px] h-[300px] flex items-center justify-center 
                     rounded-xl bg-white/20">
             <Icon class=" opacity-70" size="128" name="solar:box-broken" />
           </div>
-          <div class="w-[300px]">
+          <div class="w-[250px]">
             <UButton class="flex w-full justify-center items-center text-md" @click="openModalLogo"
               label="Загрузить обложку" icon="solar:gallery-download-bold" size="xl" color="neutral"
               variant="outline" />
           </div>
           <div class="flex flex-col gap-5 w-full pt-2">
             <div class="flex justify-between w-full">
-              <UFormField class="w-full max-w-[500px]" size="xl" label="Название релиза">
+              <UFormField class="w-full w-full" size="xl" label="Название релиза">
                 <UInput v-model="stateDraft.realeseName" placeholder="" class="w-full" />
-              </UFormField>
-              <UFormField class="w-full max-w-[500px]" size="xl" label="Версия">
-                <UInput v-model="stateDraft.version" placeholder="" class="w-full" />
               </UFormField>
             </div>
             <div class="flex justify-between w-full">
@@ -339,12 +315,9 @@ function cleanupArtists() {
               </UFormField>
             </div>
             <div class="flex flex-col justify-between w-full">
-              <UFormField class="w-full" size="xl" label="Приглашенный артисты">
-                <div class="w-full pt-2 flex items-center" v-for="(artist, index) in inviteArtist" :key="index">
-                  <UInput v-model="inviteArtist[index]" placeholder="" class="w-full" />
-                  <UButton class="ml-2" v-if="inviteArtist.length > 1 && index !== inviteArtist.length - 1"
-                    icon="solar:trash-bin-2-broken" variant="outline" color="error"
-                    @click="inviteArtist.splice(index, 1)" />
+              <UFormField class="w-full" size="xl" label="Приглашенные артисты">
+                <div class="w-full pt-2 flex items-center">
+                  <UInput v-model="stateDraft.invateArtist" placeholder="" class="w-full" />
                 </div>
               </UFormField>
             </div>
@@ -354,7 +327,7 @@ function cleanupArtists() {
                 :trailing="true" variant="solid" color="primary" />
               </div>
               <div class="">
-                              <UButton @click="handleSaveChangeDraft()" size="xl" class="cursor-pointer" label="Далее" icon="solar:alt-arrow-right-broken"
+                              <UButton @click="next()" size="xl" class="cursor-pointer" label="Далее" icon="solar:alt-arrow-right-broken"
                 :trailing="true" variant="outline" color="primary" />
               </div>
             </div>
