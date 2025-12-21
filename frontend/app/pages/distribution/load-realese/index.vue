@@ -12,7 +12,7 @@ const handleCreateDraft = async () => {
             'author': pb.authStore.record?.id,
             'realeseName': nameDraft.value
         })
-        await navigateTo(`/distribution/drafts/update/${draft.id}`)
+        await navigateTo(`/distribution/drafts/update/info/${draft.id}`)
     } catch (err) {
         console.log(err)
     }

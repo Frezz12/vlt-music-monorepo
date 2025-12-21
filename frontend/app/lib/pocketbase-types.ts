@@ -17,6 +17,7 @@ export enum Collections {
 	MediadiceToken = "mediadice_token",
 	Promocodes = "promocodes",
 	SocialLinks = "social_links",
+	Track = "track",
 	Users = "users",
 }
 
@@ -109,6 +110,7 @@ export type DraftRecord = {
 	main_artist?: string
 	realese_data?: IsoDateString
 	realese_name?: string
+	tracks?: RecordIdString[]
 	upc?: string
 	updated: IsoAutoDateString
 	version?: string
@@ -157,6 +159,23 @@ export type SocialLinksRecord = {
 	user?: RecordIdString
 }
 
+export type TrackRecord = {
+	audiofile?: FileNameString
+	created: IsoAutoDateString
+	fio_authors?: string
+	fio_composers?: string
+	id: string
+	invate_artists?: string
+	irsc?: string
+	main_artist?: string
+	profanity?: boolean
+	realese_name?: string
+	text?: string
+	tiktok_time?: string
+	updated: IsoAutoDateString
+	version?: string
+}
+
 export type UsersRecord = {
 	avatar?: FileNameString
 	balance?: number
@@ -187,6 +206,7 @@ export type LastReleasesResponse<Texpand = unknown> = Required<LastReleasesRecor
 export type MediadiceTokenResponse<Texpand = unknown> = Required<MediadiceTokenRecord> & BaseSystemFields<Texpand>
 export type PromocodesResponse<Texpand = unknown> = Required<PromocodesRecord> & BaseSystemFields<Texpand>
 export type SocialLinksResponse<Texpand = unknown> = Required<SocialLinksRecord> & BaseSystemFields<Texpand>
+export type TrackResponse<Texpand = unknown> = Required<TrackRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -203,6 +223,7 @@ export type CollectionRecords = {
 	mediadice_token: MediadiceTokenRecord
 	promocodes: PromocodesRecord
 	social_links: SocialLinksRecord
+	track: TrackRecord
 	users: UsersRecord
 }
 
@@ -218,6 +239,7 @@ export type CollectionResponses = {
 	mediadice_token: MediadiceTokenResponse
 	promocodes: PromocodesResponse
 	social_links: SocialLinksResponse
+	track: TrackResponse
 	users: UsersResponse
 }
 

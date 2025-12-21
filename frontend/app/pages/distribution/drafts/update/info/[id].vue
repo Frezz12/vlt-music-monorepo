@@ -277,7 +277,7 @@ const next = () => {
           </div>
           <div class="flex flex-col gap-5 w-full pt-2">
             <div class="flex justify-between w-full">
-              <UFormField class="w-full w-full" size="xl" label="Название релиза">
+              <UFormField class="w-full" size="xl" label="Название релиза">
                 <UInput v-model="stateDraft.realeseName" placeholder="" class="w-full" />
               </UFormField>
             </div>
