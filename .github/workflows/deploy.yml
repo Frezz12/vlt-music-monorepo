@@ -12,6 +12,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+<<<<<<< HEAD
+=======
     - name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v3
       
@@ -33,6 +35,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -41,13 +44,42 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT || 22 }}
         script: |
+<<<<<<< HEAD
+          # Install Docker and Docker Compose if not installed
+          if ! command -v docker &> /dev/null; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sh get-docker.sh
+            systemctl start docker
+            systemctl enable docker
+          fi
+          
+          if ! command -v docker-compose &> /dev/null; then
+            curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+          fi
+          
+          # Create project directory if not exists
+          mkdir -p /opt/vlt-music
           cd /opt/vlt-music
           
+          # Clone repository if not exists
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/Frezz12/vlt-music-monorepo.git .
+          fi
+          
+=======
+          cd /opt/vlt-music
+          
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
           # Pull latest changes
           git pull origin test-realese
           
           # Stop existing containers
+<<<<<<< HEAD
+          docker-compose down || true
+=======
           docker-compose down
+>>>>>>> 8d081dd6a7e16bcab065d4702cc336d070eb276b
           
           # Build images on server
           docker-compose build --no-cache
